@@ -9,9 +9,6 @@ public class Arbit {
   @Nullable private final String optionalField;
 
   private Arbit(Builder builder) {
-    if (builder.requiredField == null) {
-      throw new IllegalStateException("Required Field required");
-    }
     this.requiredField = builder.requiredField;
     this.optionalField = builder.optionalField;
   }
@@ -25,15 +22,15 @@ public class Arbit {
   }
 
   public static class Builder {
-    private String requiredField;
-    private String optionalField;
+    @Nonnull private String requiredField;
+    @Nullable private String optionalField;
 
-    public Builder requiredField(String requiredField) {
+    public Builder requiredField(@Nonnull String requiredField) {
       this.requiredField = requiredField;
       return this;
     }
 
-    public Builder optionalField(String optionalField) {
+    public Builder optionalField(@Nullable String optionalField) {
       this.optionalField = optionalField;
       return this;
     }
