@@ -6,16 +6,12 @@ buildscript {
     }
 }
 
-plugins {
-    // we assume you are already using the Java plugin
-    id "net.ltgt.apt" version "0.13"
-    id "net.ltgt.errorprone" version "0.0.13"
-}
-
 group 'check'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'application'
+mainClassName = 'com.benchmark.JsonBenchmark'
 
 sourceCompatibility = 1.8
 
@@ -24,35 +20,24 @@ repositories {
 }
 
 dependencies {
-    apt "com.github.bangarharshit:rxbase:0.0.2"
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile "io.reactivex.rxjava2:rxjava:2.1.5"
-    compile 'com.squareup.okhttp3:okhttp:3.9.0'
-    testCompile('org.junit.jupiter:junit-jupiter-api:5.0.0')
-    testCompile('org.apache.logging.log4j:log4j-core:2.8.2')
-    testCompile('com.h2database:h2:1.4.196')
-    compile 'com.squareup:javapoet:1.9.0'
-    testCompile('org.junit.jupiter:junit-jupiter-engine:5.0.0')
-    testCompile 'org.junit.platform:junit-platform-engine'
+    compile group: 'com.squareup.moshi', name: 'moshi', version: '1.5.0'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
+    compile 'org.openjdk.jmh:jmh-core:1.10.3'
+    compile 'org.openjdk.jmh:jmh-generator-annprocess:1.10.3'
 
-    errorprone "com.google.errorprone:error_prone_core:2.1.3"
+    annotationProcessor 'com.ryanharter.auto.value:auto-value-moshi:0.4.5'
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api'
-    testCompile 'org.junit.jupiter:junit-jupiter-engine'
-    apt "com.uber.nullaway:nullaway:0.3.2"
-
-    // Optional, some source of nullability annotations.
-    // Not required on Android if you use the support
-    // library nullability annotations.
-    compileOnly "com.google.code.findbugs:jsr305:3.0.2"
-
-    errorprone "com.google.errorprone:error_prone_core:2.1.3"
+    // if you use the @MoshiAdapterFactory annotation, you'll need to add the 'annotations' artifact
+    // as a provided dependency:
+    provided 'com.ryanharter.auto.value:auto-value-moshi-annotations:0.4.5'
 }
 
+run {
+    def hasIterate = project.hasProperty("iterate");
+    def hasForks = project.hasProperty("forks");
 
-tasks.withType(JavaCompile) {
-    // remove the if condition if you want to run NullAway on test code
-    if (!name.toLowerCase().contains("test")) {
-        options.compilerArgs += ["-Xep:NullAway:ERROR", "-XepOpt:NullAway:AnnotatedPackages=com"]
-    }
+    args = [
+            "${hasIterate ? iterate : 10}",
+            "${hasForks ? forks : 1}"
+    ]
 }
