@@ -2,6 +2,8 @@ package com.benchmark;
 
 
 import com.benchmark.model.RidiculouslyBigUser;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 import com.google.gson.Gson;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -36,12 +38,14 @@ public class Benchmarker {
   private Moshi moshi;
   private RbuMoshiStreamingParser moshiStreamingParser;
   private Gson gson;
+  private Kryo kryo;
 
   @Setup(Level.Trial)
   public void setup() {
     moshi = new Moshi.Builder().build();
     moshiStreamingParser = new RbuMoshiStreamingParser();
     gson = new Gson();
+    kryo = new Kryo();
   }
 
   @Benchmark
@@ -62,6 +66,13 @@ public class Benchmarker {
   }
 
   @Benchmark
+  public RidiculouslyBigUser kryoBenchmarking() throws IOException {
+    try (Input input = new Input(getTestDataStreamForKryo())) {
+      return kryo.readObject(input, RidiculouslyBigUser.class);
+    }
+  }
+
+  @Benchmark
   public RidiculouslyBigUser gsonReflection() throws IOException {
     try (InputStreamReader reader = new InputStreamReader(getTestDataStream())) {
       return gson.fromJson(reader, RidiculouslyBigUser.class);
@@ -77,5 +88,10 @@ public class Benchmarker {
   private InputStream getTestDataStream() {
     ClassLoader classLoader = getClass().getClassLoader();
     return classLoader.getResourceAsStream("test_data.json");
+  }
+
+  private InputStream getTestDataStreamForKryo() {
+    ClassLoader classLoader = getClass().getClassLoader();
+    return classLoader.getResourceAsStream("test_data.bin");
   }
 }

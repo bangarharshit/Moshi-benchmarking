@@ -24,12 +24,8 @@ dependencies {
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
     compile 'org.openjdk.jmh:jmh-core:1.10.3'
     compile 'org.openjdk.jmh:jmh-generator-annprocess:1.10.3'
-
-    annotationProcessor 'com.ryanharter.auto.value:auto-value-moshi:0.4.5'
-
-    // if you use the @MoshiAdapterFactory annotation, you'll need to add the 'annotations' artifact
-    // as a provided dependency:
-    provided 'com.ryanharter.auto.value:auto-value-moshi-annotations:0.4.5'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.10'
+    compile 'com.esotericsoftware:kryo:4.0.2'
 }
 
 run {
